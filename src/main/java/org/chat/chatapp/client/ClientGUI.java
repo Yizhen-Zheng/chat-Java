@@ -76,6 +76,7 @@ public class ClientGUI extends JFrame implements MessageListener {
         messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.Y_AXIS));
         messagePanel.setBackground(Utilities.TRANSPARENT_COLOR);
 
+        messagePanelScrollPane = new JScrollPane(messagePanel);
         messagePanelScrollPane.setBackground(Utilities.TRANSPARENT_COLOR);
         messagePanelScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         messagePanelScrollPane.getVerticalScrollBar().setUnitIncrement(16);
@@ -173,6 +174,7 @@ public class ClientGUI extends JFrame implements MessageListener {
         revalidate();
         repaint();
     }
+
     private void updateMessageSize(){
         for(int i = 0; i < messagePanel.getComponents().length; i++){
             Component component = messagePanel.getComponent(i);
@@ -181,9 +183,9 @@ public class ClientGUI extends JFrame implements MessageListener {
                 if(chatMessage.getComponent(1) instanceof JLabel){
                     JLabel messageLabel = (JLabel) chatMessage.getComponent(1);
                     messageLabel.setText("<html>" +
-                            "<body style='width:" + (0.60 * getWidth()) + "'px>" +
-                            messageLabel.getText() +
-                            "</body>" +
+                                "<body style='width:" + (0.60 * getWidth()) + "'px>" +
+                                    messageLabel.getText() +
+                                "</body>" +
                             "</html>");
                 }
             }
