@@ -22,18 +22,18 @@ public class WebsocketController {
     @MessageMapping("/connect")
     public void connectUser(String username){
         sessionManager.addUsername(username);
-        sessionManager.broadcastActiveUsername();
+        sessionManager.broadcastActiveUsernames();
         System.out.println(username +" connected");
     }
     @MessageMapping("/disconnect")
     public void disconnectUser(String username){
         sessionManager.removeUsername(username);
-        sessionManager.broadcastActiveUsername();
+        sessionManager.broadcastActiveUsernames();
         System.out.println(username +" disconnected");
     }
     @MessageMapping("/request-users")
     public void requestUsers(){
-        sessionManager.broadcastActiveUsername();
+        sessionManager.broadcastActiveUsernames();
         System.out.println("Requesting Users");
     }
 

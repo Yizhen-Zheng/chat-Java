@@ -12,17 +12,21 @@ public class WebSocketSessionManager {
     private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public WebSocketSessionManager(SimpMessagingTemplate messagingTemplate){
+    public WebSocketSessionManager(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
     }
-    public void addUsername(String username){
+
+    public void addUsername(String username) {
         activeUsernames.add(username);
     }
-    public void removeUsername(String username){
+
+    public void removeUsername(String username) {
         activeUsernames.remove(username);
     }
-    public void broadcastActiveUsername(){
+
+    public void broadcastActiveUsernames() {
         messagingTemplate.convertAndSend("/topic/users", activeUsernames);
-        System.out.println("Broadcasting active users to /topic.users " + activeUsernames);
+        System.out.println("Broadcasting active users to /topic/users " + activeUsernames);
     }
+
 }

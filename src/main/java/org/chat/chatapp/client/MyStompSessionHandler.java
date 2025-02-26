@@ -13,14 +13,14 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter {
     private String username;
     private MessageListener messageListener;
 
-    public  MyStompSessionHandler(MessageListener messageListener, String username){
+    public MyStompSessionHandler(MessageListener messageListener, String username){
         this.username = username;
         this.messageListener = messageListener;
     }
+
     @Override
-    public void afterConnected(StompSession session, StompHeaders connectedHeaders){
+    public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
         System.out.println("Client Connected");
-        session.send("/app/connect", username);
 
         session.subscribe("/topic/messages", new StompFrameHandler() {
             @Override
@@ -30,15 +30,15 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter {
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                try{
-                    if(payload instanceof Message){
+                try {
+                    if (payload instanceof Message) {
                         Message message = (Message) payload;
                         messageListener.onMessageRecieve(message);
-                        System.out.println("Received message: " + message.getUser() + ":" + message.getMessage());
-                    }else {
+                        System.out.println("Received message: " + message.getUser() + ": " + message.getMessage());
+                    } else {
                         System.out.println("Received unexpected payload type: " + payload.getClass());
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -55,22 +55,23 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter {
             public void handleFrame(StompHeaders headers, Object payload) {
                 try{
                     if(payload instanceof ArrayList){
-                        ArrayList<String>activeUsers = (ArrayList<String>)payload;
+                        ArrayList<String> activeUsers = (ArrayList<String>) payload;
                         messageListener.onActiveUsersUpdated(activeUsers);
                         System.out.println("Received active users: " + activeUsers);
                     }
-                }catch (Exception e){
+                }catch(Exception e){
                     e.printStackTrace();
                 }
             }
         });
-        System.out.println("Subscribe to /topic/users");
+        System.out.println("Subscribed to /topic/users");
 
         session.send("/app/connect", username);
         session.send("/app/request-users", "");
     }
+
     @Override
-    public void handleTransportError(StompSession session, Throwable exception){
+    public void handleTransportError(StompSession session, Throwable exception) {
         exception.printStackTrace();
     }
 }

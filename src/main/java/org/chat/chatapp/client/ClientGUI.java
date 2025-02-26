@@ -11,9 +11,8 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-public class ClientGUI extends JFrame implements MessageListener {
-//        TODO: correct execute order:Connect -> broadcast -> receive message -> send message -> another broadcast -> disconnect
-//        await ?
+
+public class ClientGUI extends JFrame implements MessageListener{
     private JPanel connectedUsersPanel, messagePanel;
     private MyStompClient myStompClient;
     private String username;
@@ -30,8 +29,9 @@ public class ClientGUI extends JFrame implements MessageListener {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-//                TODO: add shortcut to close window
-                int option = JOptionPane.showConfirmDialog(ClientGUI.this, "Do you really want to leave?", "Exit", JOptionPane.YES_NO_OPTION);
+                int option = JOptionPane.showConfirmDialog(ClientGUI.this, "Do you really want to leave?",
+                        "Exit", JOptionPane.YES_NO_OPTION);
+
                 if(option == JOptionPane.YES_OPTION){
                     myStompClient.disconnectUser(username);
                     ClientGUI.this.dispose();
@@ -49,13 +49,15 @@ public class ClientGUI extends JFrame implements MessageListener {
         getContentPane().setBackground(Utilities.PRIMARY_COLOR);
         addGuiComponents();
     }
+
     private void addGuiComponents(){
         addConnectedUsersComponents();
         addChatComponents();
     }
+
     private void addConnectedUsersComponents(){
         connectedUsersPanel = new JPanel();
-        connectedUsersPanel.setBorder(Utilities.addPadding(10,10,10,10));
+        connectedUsersPanel.setBorder(Utilities.addPadding(10, 10, 10, 10));
         connectedUsersPanel.setLayout(new BoxLayout(connectedUsersPanel, BoxLayout.Y_AXIS));
         connectedUsersPanel.setBackground(Utilities.SECONDARY_COLOR);
         connectedUsersPanel.setPreferredSize(new Dimension(200, getHeight()));
@@ -67,6 +69,7 @@ public class ClientGUI extends JFrame implements MessageListener {
 
         add(connectedUsersPanel, BorderLayout.WEST);
     }
+
     private void addChatComponents(){
         JPanel chatPanel = new JPanel();
         chatPanel.setLayout(new BorderLayout());
@@ -87,13 +90,11 @@ public class ClientGUI extends JFrame implements MessageListener {
                 repaint();
             }
         });
+
         chatPanel.add(messagePanelScrollPane, BorderLayout.CENTER);
 
-
-        messagePanel.add(createChatMessageComponent(new Message("Cabbage", "Hello")));
-
         JPanel inputPanel = new JPanel();
-        inputPanel.setBorder(Utilities.addPadding(10,10,10,10));
+        inputPanel.setBorder(Utilities.addPadding(10, 10, 10, 10));
         inputPanel.setLayout(new BorderLayout());
         inputPanel.setBackground(Utilities.TRANSPARENT_COLOR);
 
@@ -101,49 +102,52 @@ public class ClientGUI extends JFrame implements MessageListener {
         inputField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
-                if(e.getKeyChar()==KeyEvent.VK_ENTER){
+                if(e.getKeyChar() == KeyEvent.VK_ENTER){
                     String input = inputField.getText();
-                    if(input.isEmpty()){
-                        return;
-                    }
+
+                    // edge case: empty message (prevent empty messages)
+                    if(input.isEmpty()) return;
+
                     inputField.setText("");
 
-                    myStompClient.sendMessage(new Message(username,input));
+                    myStompClient.sendMessage(new Message(username, input));
                 }
             }
         });
         inputField.setBackground(Utilities.SECONDARY_COLOR);
         inputField.setForeground(Utilities.TEXT_COLOR);
-        inputField.setBorder(Utilities.addPadding(0,10,0,10));
-        inputField.setFont(new Font("Inter",Font.PLAIN, 16));
+        inputField.setBorder(Utilities.addPadding(0, 10, 0, 10));
+        inputField.setFont(new Font("Inter", Font.PLAIN, 16));
         inputField.setPreferredSize(new Dimension(inputPanel.getWidth(), 50));
         inputPanel.add(inputField, BorderLayout.CENTER);
         chatPanel.add(inputPanel, BorderLayout.SOUTH);
 
         add(chatPanel, BorderLayout.CENTER);
     }
+
     private JPanel createChatMessageComponent(Message message){
-     JPanel chatMessage = new JPanel();
-     chatMessage.setBackground(Utilities.TRANSPARENT_COLOR);
-     chatMessage.setLayout(new BoxLayout(chatMessage, BoxLayout.Y_AXIS));
-     chatMessage.setBorder(Utilities.addPadding(20,20,10,20));
+        JPanel chatMessage = new JPanel();
+        chatMessage.setBackground(Utilities.TRANSPARENT_COLOR);
+        chatMessage.setLayout(new BoxLayout(chatMessage, BoxLayout.Y_AXIS));
+        chatMessage.setBorder(Utilities.addPadding(20, 20, 10, 20));
 
-     JLabel usernameLable = new JLabel(message.getUser());
-     usernameLable.setFont(new Font("Inter", Font.BOLD, 18));
-     usernameLable.setForeground(Utilities.TEXT_COLOR);
-     chatMessage.add(usernameLable);
+        JLabel usernameLabel = new JLabel(message.getUser());
+        usernameLabel.setFont(new Font("Inter", Font.BOLD, 18));
+        usernameLabel.setForeground(Utilities.TEXT_COLOR);
+        chatMessage.add(usernameLabel);
 
-     JLabel messageLabel = new JLabel();
-     messageLabel.setText("<html>" +
+        JLabel messageLabel = new JLabel();
+        messageLabel.setText("<html>" +
                 "<body style='width:" + (0.60 * getWidth()) + "'px>" +
-                    message.getMessage() +
-                "</body>" +
-             "</html>");
-     messageLabel.setFont(new Font("Inter", Font.PLAIN, 18));
-     messageLabel.setForeground(Utilities.TEXT_COLOR);
-     chatMessage.add(messageLabel);
+                message.getMessage() +
+                "</body>"+
+                "</html>");
+        messageLabel.setFont(new Font("Inter", Font.PLAIN, 18));
+        messageLabel.setForeground(Utilities.TEXT_COLOR);
+        chatMessage.add(messageLabel);
+        System.out.println(messageLabel.getText());
 
-     return chatMessage;
+        return chatMessage;
     }
 
     @Override
@@ -157,19 +161,24 @@ public class ClientGUI extends JFrame implements MessageListener {
 
     @Override
     public void onActiveUsersUpdated(ArrayList<String> users) {
+        // remove the current user list panel (which should be the second component in the panel)
+        // the user list panel doesn't get added until after and this is mainly for when the users get updated
         if(connectedUsersPanel.getComponents().length >= 2){
             connectedUsersPanel.remove(1);
         }
+
         JPanel userListPanel = new JPanel();
         userListPanel.setBackground(Utilities.TRANSPARENT_COLOR);
         userListPanel.setLayout(new BoxLayout(userListPanel, BoxLayout.Y_AXIS));
+
         for(String user : users){
-             JLabel username = new JLabel();
-             username.setText(user);
-             username.setForeground(Utilities.TEXT_COLOR);
-             username.setFont(new Font("Inter", Font.BOLD, 16));
-             userListPanel.add(username);
+            JLabel username = new JLabel();
+            username.setText(user);
+            username.setForeground(Utilities.TEXT_COLOR);
+            username.setFont(new Font("Inter", Font.BOLD, 16));
+            userListPanel.add(username);
         }
+
         connectedUsersPanel.add(userListPanel);
         revalidate();
         repaint();
@@ -183,9 +192,9 @@ public class ClientGUI extends JFrame implements MessageListener {
                 if(chatMessage.getComponent(1) instanceof JLabel){
                     JLabel messageLabel = (JLabel) chatMessage.getComponent(1);
                     messageLabel.setText("<html>" +
-                                "<body style='width:" + (0.60 * getWidth()) + "'px>" +
-                                    messageLabel.getText() +
-                                "</body>" +
+                            "<body style='width:" + (0.60 * getWidth()) + "'px>" +
+                            messageLabel.getText() +
+                            "</body>"+
                             "</html>");
                 }
             }
