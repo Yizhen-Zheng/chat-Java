@@ -14,13 +14,13 @@ public class WebsocketController {
         this.sessionManager = sessionManager;
     }
     @MessageMapping("/message")
-    public  void handleMessage(Message message){
+    public void handleMessage(Message message){
         System.out.println("Received message from user: " + message.getUser() + ": " + message.getMessage());
         messagingTemplate.convertAndSend("/topic/messages", message);
         System.out.println("Sent message to /topic/messages: " + message.getUser() + ": " + message.getMessage());
     }
     @MessageMapping("/connect")
-    public  void connectUser(String username){
+    public void connectUser(String username){
         sessionManager.addUsername(username);
         sessionManager.broadcastActiveUsername();
         System.out.println(username +" connected");
@@ -30,7 +30,11 @@ public class WebsocketController {
         sessionManager.removeUsername(username);
         sessionManager.broadcastActiveUsername();
         System.out.println(username +" disconnected");
-
+    }
+    @MessageMapping("/request-users")
+    public void requestUsers(){
+        sessionManager.broadcastActiveUsername();
+        System.out.println("Requesting Users");
     }
 
 }
