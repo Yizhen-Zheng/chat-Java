@@ -1,5 +1,6 @@
 package org.chat.chatapp.client;
 
+import org.chat.chatapp.GeminiClient;
 import org.chat.chatapp.Message;
 
 import javax.swing.*;
@@ -8,8 +9,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
+import com.google.genai.types.GenerateContentResponse;
+
 
 
 public class ClientGUI extends JFrame implements MessageListener{
@@ -17,12 +21,13 @@ public class ClientGUI extends JFrame implements MessageListener{
     private MyStompClient myStompClient;
     private String username;
     private JScrollPane messagePanelScrollPane;
+    private GeminiClient geminiClient;
 
-    public ClientGUI(String username) throws ExecutionException, InterruptedException {
+    public ClientGUI(String username) throws ExecutionException, InterruptedException, IOException, org.apache.http.HttpException {
         super("User: " + username);
         this.username = username;
         myStompClient = new MyStompClient(this, username);
-
+        geminiClient =  new GeminiClient(this);
         setSize(1218, 685);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -111,6 +116,8 @@ public class ClientGUI extends JFrame implements MessageListener{
                     inputField.setText("");
 
                     myStompClient.sendMessage(new Message(username, input));
+                    GenerateContentResponse response = geminiClient.onMessage(new Message(username, input));
+                    myStompClient.sendMessage(new Message("Gemini", response.text()));
                 }
             }
         });
@@ -200,4 +207,5 @@ public class ClientGUI extends JFrame implements MessageListener{
             }
         }
     }
+
 }

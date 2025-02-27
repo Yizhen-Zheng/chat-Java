@@ -1,6 +1,9 @@
 package  org.chat.chatapp.client;
 
+import org.chat.chatapp.GeminiClient;
+
 import javax.swing.*;
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 public class App {
@@ -23,9 +26,14 @@ public class App {
                 ClientGUI clientGUI = null;
                 try{
                  clientGUI = new ClientGUI(username);
+
                 }catch (ExecutionException e){
                     throw new RuntimeException(e);
                 }catch (InterruptedException e){
+                    throw new RuntimeException(e);
+                }catch (IOException e){
+                    throw new RuntimeException(e);
+                }catch (org.apache.http.HttpException e){
                     throw new RuntimeException(e);
                 }
                 clientGUI.setVisible(true);

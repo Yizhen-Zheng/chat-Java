@@ -1,4 +1,6 @@
-package org.chat.chatapp;
+package org.chat.chatapp.controller;
+import org.chat.chatapp.Message;
+import org.chat.chatapp.WebSocketSessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import  org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -7,7 +9,7 @@ import  org.springframework.stereotype.Controller;
 @Controller
 public class WebsocketController {
     private final  SimpMessagingTemplate messagingTemplate;
-    private final  WebSocketSessionManager sessionManager;
+    private final WebSocketSessionManager sessionManager;
     @Autowired
     public WebsocketController(SimpMessagingTemplate messagingTemplate, WebSocketSessionManager sessionManager){
         this.messagingTemplate = messagingTemplate;
